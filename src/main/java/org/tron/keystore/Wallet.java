@@ -47,6 +47,9 @@ import java.util.UUID;
  */
 public class Wallet {
 
+  private static final int N_ULTRA_LIGHT = 1 << 8;
+  private static final int P_ULTRA_LIGHT = 1;
+
   private static final int N_LIGHT = 1 << 12;
   private static final int P_LIGHT = 6;
 
@@ -64,21 +67,17 @@ public class Wallet {
 
   public static WalletFile create(byte[] password, SignInterface ecKeySm2Pair, int n, int p)
       throws CipherException {
-
+    long t0 = System.currentTimeMillis();
     byte[] salt = generateRandomBytes(32);
-
+    System.out.println("===================");
     byte[] derivedKey = generateDerivedScryptKey(password, salt, n, R, p, DKLEN);
-
+    System.out.println(System.currentTimeMillis() - t0);
     byte[] encryptKey = Arrays.copyOfRange(derivedKey, 0, 16);
     byte[] iv = generateRandomBytes(16);
-
     byte[] privateKeyBytes = ecKeySm2Pair.getPrivKeyBytes();
-
     byte[] cipherText = performCipherOperation(Cipher.ENCRYPT_MODE, iv, encryptKey,
         privateKeyBytes);
-
     byte[] mac = generateMac(derivedKey, cipherText);
-
     return createWalletFile(ecKeySm2Pair, cipherText, iv, salt, mac, n, p);
   }
 
@@ -86,9 +85,15 @@ public class Wallet {
       throws CipherException {
     return create(password, ecKeySm2Pair, N_STANDARD, P_STANDARD);
   }
+
   public static WalletFile createLight(byte[] password, SignInterface ecKeySm2Pair)
       throws CipherException {
     return create(password, ecKeySm2Pair, N_LIGHT, P_LIGHT);
+  }
+
+  public static WalletFile createUltraLight(byte[] password, SignInterface ecKeySm2Pair)
+      throws CipherException {
+    return create(password, ecKeySm2Pair, N_ULTRA_LIGHT, P_ULTRA_LIGHT);
   }
   private static WalletFile createWalletFile(
           SignInterface ecKeySm2Pair, byte[] cipherText, byte[] iv, byte[] salt, byte[] mac,

@@ -107,6 +107,11 @@ public class WalletUtils {
     return fileName;
   }
 
+  public static void writeWalletToFile(WalletFile walletFile, File file)
+      throws IOException {
+    objectMapper.writeValue(file, walletFile);
+  }
+
   //    /**
 //     * Generates a BIP-39 compatible Ethereum wallet. The private key for the wallet can
 //     * be calculated using following algorithm:
