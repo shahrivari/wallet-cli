@@ -67,11 +67,8 @@ public class Wallet {
 
   public static WalletFile create(byte[] password, SignInterface ecKeySm2Pair, int n, int p)
       throws CipherException {
-    long t0 = System.currentTimeMillis();
     byte[] salt = generateRandomBytes(32);
-    System.out.println("===================");
     byte[] derivedKey = generateDerivedScryptKey(password, salt, n, R, p, DKLEN);
-    System.out.println(System.currentTimeMillis() - t0);
     byte[] encryptKey = Arrays.copyOfRange(derivedKey, 0, 16);
     byte[] iv = generateRandomBytes(16);
     byte[] privateKeyBytes = ecKeySm2Pair.getPrivKeyBytes();
